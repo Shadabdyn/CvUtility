@@ -1,0 +1,37 @@
+
+//include settings
+.
+lnInclude
+/opt/openfoam6/src/finiteVolume/lnInclude
+/opt/openfoam6/src/meshTools/lnInclude
+/opt/openfoam6/src/OpenFOAM/lnInclude
+
+
+
+//Cv Convergence criteria parameters
+        label interval_;
+        label startTime_;
+        label CoIterations_;
+        scalar tolPercentage_;
+        scalar tolDegree_;
+
+List<label> CvList;
+
+CvList.append(Cv);
+
+        if(CvList.size() > 349)
+        {
+            if
+        }
+
+
+
+
+
+
+//Cv Convergence criteria parameters
+    interval_("interval"),
+    startTime_("startTime"),
+    CoIterations_("CoIterations"),
+    tolPercentage_("tolPercentage"),
+    tolDegree_("tolDegree"),

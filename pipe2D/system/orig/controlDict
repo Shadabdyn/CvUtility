@@ -1,0 +1,154 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.5                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     simpleFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          writeNow;
+
+endTime         1500;
+
+deltaT          1;
+
+writeControl    timeStep;
+
+writeInterval   10;
+
+purgeWrite      2;
+
+writeFormat     ascii;
+
+writePrecision  8;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+functions
+{
+    #includeFunc residuals;
+    
+        pressureMonitorFunc_Inlet
+    {
+        type            surfaceFieldValue;
+        libs ("libfieldFunctionObjects.so");
+        writeControl timeStep;
+        writeInterval  1;
+        log             true;
+        valueOutput     false;
+        source          patch;
+        name            Inlet;
+        operation       areaAverage;
+        fields
+        (
+            "p"
+            "U"
+        );
+        writeFields     yes;
+        regionType      patch;
+        surfaceFormat	null;
+    }
+
+    #include "forces"
+	
+    SixDPlane
+	{
+    	type            surfaceFieldValue;
+    	functionObjectLibs ("libfieldFunctionObjects.so");
+		writeControl timeStep;
+        writeInterval  1;
+    	log             true;
+    	valueOutput     false;
+    	source          sampledSurface;
+		name            SixDPlane;
+    	sampledSurfaceDict
+    	{
+        		type            cuttingPlane;
+        		planeType pointAndNormal;
+        		pointAndNormalDict
+		        {
+			        basePoint       (0 0 -0.6262);    //base point at which plane to be taken 
+			        normalVector    (0 0 -1);	    //normal direction in which plane to be taken
+    		    }
+			    interpolate     true;
+		}
+		operation       areaAverage;
+		fields
+       	(
+            p
+        );
+		writeFields     yes;
+		regionType      sampledSurface;
+		surfaceFormat   null;
+	}
+    	
+    TwoDPlane
+	{
+    	type            surfaceFieldValue;
+    	functionObjectLibs ("libfieldFunctionObjects.so");
+		writeControl timeStep;
+        writeInterval  1;
+    	log             true;
+    	valueOutput     false;
+    	source          sampledSurface;
+		name            TwoDPlane;
+    	sampledSurfaceDict
+    	{
+        		type            cuttingPlane;
+        		planeType pointAndNormal;
+        		pointAndNormalDict
+		        {
+			        basePoint       (0 0 0.2262);    //base point at which plane to be taken 
+			        normalVector    (0 0 -1);	    //normal direction in which plane to be taken
+    		    }
+			    interpolate     true;
+		}
+		operation       areaAverage;
+		fields
+       	(
+            p
+        );
+		writeFields     yes;
+		regionType      sampledSurface;
+		surfaceFormat   null;
+	}
+	
+CvCalculator
+{
+    functionObjectLibs ("libCvCalc.so");
+    type CvCalc;
+
+    twoDFaceZoneName inletPlaneFaceZone;
+    sixDFaceZoneName outletPlaneFaceZone;
+    UName U;
+    pName p;
+
+    writeInterval timeStep;
+    writeInterval 1;
+}
+    
+}
+
+
+// ************************************************************************* //
+
